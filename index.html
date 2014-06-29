@@ -70,8 +70,10 @@ function toggle_current_playing() {
 }
 
 function draw_editor(data) {
+  if (!editor.buffer) {
+    return;
+  }
   cvs = document.getElementById('visu')
-  editor.buffer = data;
   var factor = data.length / window.innerWidth;
   cvs.width = data.length / factor;
   cvs.height = 256;
@@ -103,6 +105,7 @@ function loadSample(uneURL) {
   xhr.responseType = 'arraybuffer';
   xhr.onload = function(e) {
     audioCtx.decodeAudioData(xhr.response, function(data){
+      editor.buffer = data;
       draw_editor(data);
     });
   }

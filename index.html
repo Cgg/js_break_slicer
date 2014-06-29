@@ -122,6 +122,9 @@ function loadSample(uneURL) {
     audioCtx.decodeAudioData(xhr.response, function(data){
       editor.buffer = data;
       draw_editor(data);
+      if (editor.playing) {
+        start_playback();
+      }
     });
   }
   xhr.onerror = function(e) {

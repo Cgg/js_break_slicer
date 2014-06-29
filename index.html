@@ -26,6 +26,7 @@ var audioCtx = new AudioContext();
 window.onload = function()
 {
 var editor = {};
+var progress = {};
 
 document.getElementById('sample_combo').addEventListener('change',
   function(e) {
@@ -73,7 +74,26 @@ function start_playback() {
   source.connect(audioCtx.destination);
   editor.source = source;
 
+  var progCvs = document.getElementById('progress');
+  var progCtx = progCvs.getContext('2d');
+  progCtx.fillStyle = 'rgba(255, 0, 0, 1)';
+
+  progress.progress = 0;
+  progress.pixChunk = 5;
+  progress.chunkNumber = Math.floor(progCvs.width / progress.pixChunk);
+
   source.start();
+
+  editor.progressInterval = setInterval(function(e){
+    if (progress.progress >= progress.chunkNumber) {
+      progress.progress = 0;
+      progCtx.clearRect(0, 0, progCvs.width, progCvs.height);
+    }
+    else {
+      progCtx.fillRect(progress.progress++ * progress.pixChunk, 0,
+        progress.pixChunk, progCvs.height);
+    }
+  }, editor.buffer.duration * 1000 / progress.chunkNumber);
 
   document.getElementById("play").innerHTML = "Stop";
   editor.playing = true;
@@ -84,6 +104,11 @@ function stop_playback() {
     editor.source.stop(0);
     editor.source = null;
   }
+
+  clearInterval(editor.progressInterval);
+  var progCvs = document.getElementById('progress');
+  progCvs.getContext('2d').clearRect(0, 0, progCvs.width, progCvs.height);
+
   document.getElementById("play").innerHTML = "Play";
   editor.playing = false;
 }

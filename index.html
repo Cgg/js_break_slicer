@@ -88,20 +88,20 @@ function stop_playback() {
   editor.playing = false;
 }
 
-function draw_editor(data) {
+function draw_editor() {
   if (!editor.buffer) {
     return;
   }
   visuCvs = document.getElementById('visu');
   progCvs = document.getElementById('progress');
 
-  var factor = data.length / window.innerWidth;
-  visuCvs.width = progCvs.width = data.length / factor;
+  var factor = editor.buffer.length / window.innerWidth;
+  visuCvs.width = progCvs.width = editor.buffer.length / factor;
   visuCvs.height = progCvs.height = 256;
   progCvs.height = 2;
   var visuCtx = visuCvs.getContext("2d");
   var progCtx = progCvs.getContext("2d");
-  var b = data.getChannelData(0);
+  var b = editor.buffer.getChannelData(0);
 
   visuCtx.clearRect(0, 0, visuCvs.witdh, visuCvs.height);
   progCtx.clearRect(0, 0, progCtx.width, progCtx.height);

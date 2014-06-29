@@ -49,24 +49,39 @@ function rms(buf, offset, len) {
 }
 
 function toggle_current_playing() {
+  if (editor.playing) {
+    stop_playback();
+  }
+  else {
+    start_playback();
+  }
+}
+
+function start_playback() {
   if (!editor.buffer) {
     return;
   }
-  if (editor.source) {
-    editor.source.stop(0);
-    editor.source = null;
-    document.getElementById("play").innerHTML = "Play";
-    return;
-  }
+  stop_playback();
+
   var source = audioCtx.createBufferSource();
   source.buffer = editor.buffer;
   source.loop = true;
   source.connect(audioCtx.destination);
   editor.source = source;
 
-  document.getElementById("play").innerHTML = "Pause";
-
   source.start();
+
+  document.getElementById("play").innerHTML = "Pause";
+  editor.playing = true;
+}
+
+function stop_playback() {
+  if (editor.source) {
+    editor.source.stop(0);
+    editor.source = null;
+  }
+  document.getElementById("play").innerHTML = "Play";
+  editor.playing = false;
 }
 
 function draw_editor(data) {

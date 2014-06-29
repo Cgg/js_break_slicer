@@ -1,0 +1,18 @@
+#canvasdiv {
+  position: relative;
+}
+
+.cvs {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+
+#visu {
+  z-index: 0;
+}
+
+#progress {
+  z-index: 1;
+}
+

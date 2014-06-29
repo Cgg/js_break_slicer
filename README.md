@@ -13,5 +13,11 @@ Plan
 3. Profit!
 
 
-bouh.
+Try it
+======
 
+[here.](http://cgg.github.io/js_break_slicer/)
+
+
+
+bouh!

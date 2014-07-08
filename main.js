@@ -17,10 +17,7 @@ sampleCombo.addEventListener('change',
 });
 
 playButton.addEventListener("click", function(e) {
-  toggle_current_playing();
-});
-
-function toggle_current_playing() {
+  // toggle playback
   playButton.innerHTML = "Play";
 
   if (player.isPlaying()) {
@@ -29,7 +26,7 @@ function toggle_current_playing() {
   else if (player.startPlayback(slicer.inputBuffer())) {
     playButton.innerHTML = "Stop";
   }
-}
+});
 
 function loadSample(uneURL) {
   var xhr = new XMLHttpRequest;

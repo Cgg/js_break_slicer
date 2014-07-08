@@ -97,8 +97,10 @@ function draw_editor() {
   visuCvs = document.getElementById('visu');
   progCvs = document.getElementById('progress');
 
-  var factor = editor.buffer.length / window.innerWidth;
-  visuCvs.width = progCvs.width = editor.buffer.length / factor;
+  // the drawing takes two pixel in width to draw one RMS chunk, hence the
+  // 2 multiplier.
+  var factor = 2 * editor.buffer.length / window.innerWidth;
+  visuCvs.width = progCvs.width = window.innerWidth;
   visuCvs.height = progCvs.height = 256;
   progCvs.height = 2;
   var visuCtx = visuCvs.getContext("2d");
@@ -108,7 +110,6 @@ function draw_editor() {
   visuCtx.clearRect(0, 0, visuCvs.witdh, visuCvs.height);
   progCtx.clearRect(0, 0, progCtx.width, progCtx.height);
 
-  var j = 0;
   var max = 0;
   // rms by chunk to determine a normalization factor
   for (var i = 0; i < b.length; i=Math.floor(i+factor)) {
@@ -116,6 +117,7 @@ function draw_editor() {
     max = Math.max(max, rmsvalue);
   }
   var boost = (0.5 / max) * 256;
+  var j = 0;
   for (var i = 0; i < b.length; i=Math.floor(i+factor)) {
     var rmsvalue = rms(b, i, factor) * boost;
     rmsvalue = Math.max(1.0, rmsvalue);

@@ -10,6 +10,7 @@ function paintBuffer(canvas, buffer) {
   var height = canvas.height;
 
   var ctx = canvas.getContext('2d');
+  ctx.save();
   var b = buffer.getChannelData(0);
 
   ctx.clearRect(0, 0, width, height);
@@ -37,5 +38,29 @@ function paintBuffer(canvas, buffer) {
     ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
     ctx.fillRect(j++, height / 1.3, 1.5, +rmsVal * 0.5);
   }
+
+  ctx.restore();
+}
+
+function paintBufferWithSlicesOverlay(canvas, buffer, slicingFrameIndexes) {
+  paintBuffer(canvas, buffer);
+
+  function frameToPix(frame) {
+    var factor = Math.ceil(buffer.length / canvas.width);
+    return Math.floor(frame / factor);
+  }
+
+  var ctx = canvas.getContext('2d');
+  ctx.save();
+  ctx.strokeStyle = "rgba(255, 0, 0, 0.7)";
+
+  ctx.beginPath();
+  for (var i = 0; i < slicingFrameIndexes.length; i++) {
+    ctx.moveTo(frameToPix(slicingFrameIndexes[i]) + 0.5, 0);
+    ctx.lineTo(frameToPix(slicingFrameIndexes[i]) + 0.5, canvas.height);
+  }
+  ctx.stroke();
+
+  ctx.restore();
 }
 

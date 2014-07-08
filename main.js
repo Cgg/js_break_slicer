@@ -35,7 +35,8 @@ function loadSample(uneURL) {
   xhr.onload = function(e) {
     audioCtx.decodeAudioData(xhr.response, function(data){
       slicer.setInputBuffer(data);
-      paintBuffer(inputBufferCvs, slicer.inputBuffer());
+      paintBufferWithSlicesOverlay(inputBufferCvs, slicer.inputBuffer(),
+        slicer.slicingFrameIndexes());
       if (player.isPlaying()) {
         player.startPlayback(slicer.inputBuffer());
       }

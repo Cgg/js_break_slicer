@@ -1,9 +1,8 @@
-var audioCtx = new AudioContext();
-
 window.onload = function()
 {
+var audioCtx = new AudioContext();
+var player = makePlayer(audioCtx);
 var editor = {};
-var progress = {};
 
 document.getElementById('sample_combo').addEventListener('change',
   function(e) {
@@ -31,63 +30,15 @@ function rms(buf, offset, len) {
 }
 
 function toggle_current_playing() {
-  if (editor.playing) {
-    stop_playback();
+  var playButton = document.getElementById("play");
+  playButton.innerHTML = "Play";
+
+  if (player.isPlaying()) {
+    player.stopPlayback();
   }
-  else {
-    start_playback();
+  else if (player.startPlayback(editor.buffer)) {
+    playButton.innerHTML = "Stop";
   }
-}
-
-function start_playback() {
-  if (!editor.buffer) {
-    return;
-  }
-  stop_playback();
-
-  var source = audioCtx.createBufferSource();
-  source.buffer = editor.buffer;
-  source.loop = true;
-  source.connect(audioCtx.destination);
-  editor.source = source;
-
-  var progCvs = document.getElementById('progress');
-  var progCtx = progCvs.getContext('2d');
-  progCtx.fillStyle = 'rgba(255, 0, 0, 1)';
-
-  progress.progress = 0;
-  progress.pixChunk = 5;
-  progress.chunkNumber = Math.floor(progCvs.width / progress.pixChunk);
-
-  source.start();
-
-  editor.progressInterval = setInterval(function(e){
-    if (progress.progress >= progress.chunkNumber) {
-      progress.progress = 0;
-      progCtx.clearRect(0, 0, progCvs.width, progCvs.height);
-    }
-    else {
-      progCtx.fillRect(progress.progress++ * progress.pixChunk, 0,
-        progress.pixChunk, progCvs.height);
-    }
-  }, editor.buffer.duration * 1000 / progress.chunkNumber);
-
-  document.getElementById("play").innerHTML = "Stop";
-  editor.playing = true;
-}
-
-function stop_playback() {
-  if (editor.source) {
-    editor.source.stop(0);
-    editor.source = null;
-  }
-
-  clearInterval(editor.progressInterval);
-  var progCvs = document.getElementById('progress');
-  progCvs.getContext('2d').clearRect(0, 0, progCvs.width, progCvs.height);
-
-  document.getElementById("play").innerHTML = "Play";
-  editor.playing = false;
 }
 
 function draw_editor() {
@@ -134,8 +85,8 @@ function loadSample(uneURL) {
     audioCtx.decodeAudioData(xhr.response, function(data){
       editor.buffer = data;
       draw_editor(data);
-      if (editor.playing) {
-        start_playback();
+      if (player.isPlaying()) {
+        player.startPlayback(editor.buffer);
       }
     });
   }

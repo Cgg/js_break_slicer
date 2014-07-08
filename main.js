@@ -8,7 +8,7 @@ var sampleCombo = document.getElementById('sample_combo');
 var playButton = document.getElementById('play');
 
 var inputBufferCvs = document.getElementById('visu');
-inputBufferCvs.width = window.innerWidth;
+inputBufferCvs.width = window.innerWidth - 10;
 inputBufferCvs.height = 256;
 
 sampleCombo.addEventListener('change',

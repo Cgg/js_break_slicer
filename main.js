@@ -3,10 +3,13 @@ window.onload = function()
 var audioCtx = new AudioContext();
 var player = makePlayer(audioCtx);
 var slicer = makeSlicer();
-var editor = {};
 
 var sampleCombo = document.getElementById('sample_combo');
 var playButton = document.getElementById('play');
+
+var inputBufferCvs = document.getElementById('visu');
+inputBufferCvs.width = window.innerWidth;
+inputBufferCvs.height = 256;
 
 sampleCombo.addEventListener('change',
   function(e) {
@@ -28,45 +31,6 @@ function toggle_current_playing() {
   }
 }
 
-function draw_editor() {
-  var buf = slicer.inputBuffer();
-  if (!buf) {
-    return;
-  }
-  visuCvs = document.getElementById('visu');
-  progCvs = document.getElementById('progress');
-
-  // the drawing takes two pixel in width to draw one RMS chunk, hence the
-  // 2 multiplier.
-  var factor = 2 * buf.length / window.innerWidth;
-  visuCvs.width = progCvs.width = window.innerWidth;
-  visuCvs.height = progCvs.height = 256;
-  progCvs.height = 2;
-  var visuCtx = visuCvs.getContext("2d");
-  var progCtx = progCvs.getContext("2d");
-  var b = buf.getChannelData(0);
-
-  visuCtx.clearRect(0, 0, visuCvs.witdh, visuCvs.height);
-  progCtx.clearRect(0, 0, progCtx.width, progCtx.height);
-
-  var max = 0;
-  // rms by chunk to determine a normalization factor
-  for (var i = 0; i < b.length; i=Math.floor(i+factor)) {
-    var rmsvalue = rms(b, i, factor);
-    max = Math.max(max, rmsvalue);
-  }
-  var boost = (0.5 / max) * 256;
-  var j = 0;
-  for (var i = 0; i < b.length; i=Math.floor(i+factor)) {
-    var rmsvalue = rms(b, i, factor) * boost;
-    rmsvalue = Math.max(1.0, rmsvalue);
-    visuCtx.fillStyle = "rgba(0, 0, 0, 1.0)";
-    visuCtx.fillRect(j++, visuCvs.height / 1.3, 1.5, -rmsvalue * 1.5);
-    visuCtx.fillStyle = "rgba(0, 0, 0, 0.4)";
-    visuCtx.fillRect(j++, visuCvs.height / 1.3, 1.5, +rmsvalue * 0.5);
-  }
-}
-
 function loadSample(uneURL) {
   var xhr = new XMLHttpRequest;
   xhr.open("GET", uneURL, true);
@@ -74,7 +38,7 @@ function loadSample(uneURL) {
   xhr.onload = function(e) {
     audioCtx.decodeAudioData(xhr.response, function(data){
       slicer.setInputBuffer(data);
-      draw_editor();
+      paintBuffer(inputBufferCvs, slicer.inputBuffer());
       if (player.isPlaying()) {
         player.startPlayback(slicer.inputBuffer());
       }

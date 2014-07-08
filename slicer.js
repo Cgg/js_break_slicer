@@ -4,12 +4,15 @@ var audioCtx = new AudioContext();
 var player = makePlayer(audioCtx);
 var editor = {};
 
-document.getElementById('sample_combo').addEventListener('change',
+var sampleCombo = document.getElementById('sample_combo');
+var playButton = document.getElementById('play');
+
+sampleCombo.addEventListener('change',
   function(e) {
     loadSample(e.target.value);
 });
 
-document.getElementById("play").addEventListener("click", function(e) {
+playButton.addEventListener("click", function(e) {
   toggle_current_playing();
 });
 
@@ -30,7 +33,6 @@ function rms(buf, offset, len) {
 }
 
 function toggle_current_playing() {
-  var playButton = document.getElementById("play");
   playButton.innerHTML = "Play";
 
   if (player.isPlaying()) {
@@ -96,7 +98,7 @@ function loadSample(uneURL) {
   xhr.send(null);
 }
 
-loadSample(document.getElementById('sample_combo').value);
+loadSample(sampleCombo.value);
 
 }
 

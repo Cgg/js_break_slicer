@@ -8,7 +8,7 @@
 function makeSlicer() {
   var inputBuffer = null;
   var slicedBuffer = null;
-  var slicingFrameIndexes = new Array();
+  var slicingFrameIndexes = null;
 
   var slicer = {
     /**
@@ -19,6 +19,24 @@ function makeSlicer() {
       inputBuffer = b;
 
       // slice slice slice...
+      slicingFrameIndexes = Array();
+      var b = inputBuffer.getChannelData(0);
+      var chunkWidth = 1024;
+      var e = Array(Math.ceil(b.length / chunkWidth));
+      var eMean = 0;
+      for (var i = 0; i < e.length; i++) {
+        e[i] = rms(b, i * chunkWidth, chunkWidth);
+        eMean += e[i];
+      }
+      eMean /= e.length;
+
+      var C = 1.3;
+      var threshold = eMean * C;
+      for (var i = 0; i < e.length; i++) {
+        if (e[i] > threshold) {
+          slicingFrameIndexes.push(i * chunkWidth);
+        }
+      }
 
       slicedBuffer = b;
     },

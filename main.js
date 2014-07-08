@@ -17,22 +17,6 @@ playButton.addEventListener("click", function(e) {
   toggle_current_playing();
 });
 
-function rms(buf, offset, len) {
-  var rms = 0;
-  if (buf.length < offset + len) {
-    len = buf.length - offset;
-  }
-  if (len == 0) {
-    return 0;
-  }
-  for (var i = 0; i < len; i++) {
-    var v = buf[offset + i];
-    rms += Math.sqrt(v * v);
-  }
-  rms /= len;
-  return rms;
-}
-
 function toggle_current_playing() {
   playButton.innerHTML = "Play";
 

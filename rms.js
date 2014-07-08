@@ -15,9 +15,9 @@ function rms(buf, offset, len) {
   }
   for (var i = 0; i < len; i++) {
     var v = buf[offset + i];
-    rms += Math.sqrt(v * v);
+    rms += v * v;
   }
-  rms /= len;
+  rms = Math.sqrt(rms/len);
   return rms;
 }
 

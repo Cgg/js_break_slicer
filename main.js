@@ -2,6 +2,7 @@ window.onload = function()
 {
 var audioCtx = new AudioContext();
 var player = makePlayer(audioCtx);
+var slicer = makeSlicer();
 var editor = {};
 
 var sampleCombo = document.getElementById('sample_combo');
@@ -38,25 +39,26 @@ function toggle_current_playing() {
   if (player.isPlaying()) {
     player.stopPlayback();
   }
-  else if (player.startPlayback(editor.buffer)) {
+  else if (player.startPlayback(slicer.inputBuffer())) {
     playButton.innerHTML = "Stop";
   }
 }
 
 function draw_editor() {
-  if (!editor.buffer) {
+  var buf = slicer.inputBuffer();
+  if (!buf) {
     return;
   }
   visuCvs = document.getElementById('visu');
   progCvs = document.getElementById('progress');
 
-  var factor = editor.buffer.length / window.innerWidth;
-  visuCvs.width = progCvs.width = editor.buffer.length / factor;
+  var factor = buf.length / window.innerWidth;
+  visuCvs.width = progCvs.width = buf.length / factor;
   visuCvs.height = progCvs.height = 256;
   progCvs.height = 2;
   var visuCtx = visuCvs.getContext("2d");
   var progCtx = progCvs.getContext("2d");
-  var b = editor.buffer.getChannelData(0);
+  var b = buf.getChannelData(0);
 
   visuCtx.clearRect(0, 0, visuCvs.witdh, visuCvs.height);
   progCtx.clearRect(0, 0, progCtx.width, progCtx.height);
@@ -85,10 +87,10 @@ function loadSample(uneURL) {
   xhr.responseType = 'arraybuffer';
   xhr.onload = function(e) {
     audioCtx.decodeAudioData(xhr.response, function(data){
-      editor.buffer = data;
-      draw_editor(data);
+      slicer.setInputBuffer(data);
+      draw_editor();
       if (player.isPlaying()) {
-        player.startPlayback(editor.buffer);
+        player.startPlayback(slicer.inputBuffer());
       }
     });
   }

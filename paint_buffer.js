@@ -42,22 +42,20 @@ function paintBuffer(canvas, buffer) {
   ctx.restore();
 }
 
-function paintBufferWithSlicesOverlay(canvas, buffer, slicingFrameIndexes) {
-  paintBuffer(canvas, buffer);
-
+function paintFramesIndexes(canvas, frameIndexes, bufferLength, color) {
   function frameToPix(frame) {
-    var factor = Math.ceil(buffer.length / canvas.width);
+    var factor = Math.ceil(bufferLength / canvas.width);
     return Math.floor(frame / factor);
   }
 
   var ctx = canvas.getContext('2d');
   ctx.save();
-  ctx.strokeStyle = "rgba(255, 0, 0, 0.7)";
+  ctx.strokeStyle = color;
 
   ctx.beginPath();
-  for (var i = 0; i < slicingFrameIndexes.length; i++) {
-    ctx.moveTo(frameToPix(slicingFrameIndexes[i]) + 0.5, 0);
-    ctx.lineTo(frameToPix(slicingFrameIndexes[i]) + 0.5, canvas.height);
+  for (var i = 0; i < frameIndexes.length; i++) {
+    ctx.moveTo(frameToPix(frameIndexes[i]) + 0.5, 0);
+    ctx.lineTo(frameToPix(frameIndexes[i]) + 0.5, canvas.height);
   }
   ctx.stroke();
 

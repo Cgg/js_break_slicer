@@ -35,8 +35,10 @@ function redrawOverlay() {
   overlayCvs.getContext('2d').clearRect(
     0, 0, overlayCvs.width, overlayCvs.height);
 
-  paintFramesIndexes(overlayCvs, slicer.slicingFrameIndexes(),
-    slicer.inputBuffer().length, 'rgba(255, 0, 0, 0.7)');
+  var bufLength = slicer.inputBuffer().length;
+
+  paintFramesIndexes(overlayCvs, slicer.beatFrameIndexes(),
+    bufLength, 'rgba(255, 0, 0, 0.7)');
 }
 
 function loadSample(uneURL) {

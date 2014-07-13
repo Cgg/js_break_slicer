@@ -2,76 +2,106 @@
  * @brief makeSlicer
  * Make a buffer slicer. This takes an input buffer (setInputBuffer), finds the
  * slicing points on drum kicks (that you can retrieve with
- * slicingFrameIndexes) and randomly rearranges the slices. This produces the
+ * beatFrameIndexes) and randomly rearranges the slices. This produces the
  * sliced buffer that you can retrieve with slicedBuffer.
  */
 function makeSlicer() {
   var inputBuffer = null;
   var slicedBuffer = null;
-  var slicingFrameIndexes = null;
+  var beatFrameIndexes = new Array();
 
   var chunkWidth = 500; // in audio frames
-  var hbWidth = 20; // in chunks
+  var hbWidth = 10; // in chunks
+  var C = 1.4;
 
-  function slice() {
-    if (!inputBuffer) {
-      return;
-    }
-
-    slicingFrameIndexes = Array();
-
-    var b = inputBuffer.getChannelData(0);
-    var e = Array(Math.ceil(b.length / chunkWidth));
-    // compute the rms for each chunk in the sample.
-    for (var i = 0; i < e.length; i++) {
-      e[i] = rms(b, i * chunkWidth, chunkWidth);
-    }
+  // given an array of energy values (RMS), this function will find the peaks in
+  // it and return an array containing the indexes of these peaks.
+  function findBeatIndexes(energyArray) {
+    var e = energyArray;
 
     // compare each chunk's rms with the mean rms of the previous history and
-    // find the peaks (stored in tmpIdx).
-    var tmpIdx = Array();
-    for (var i = hbWidth + 1; i < e.length; i++) {
+    // find the peaks (stored in beatIdx).
+    var beatIdx = new Array();
+
+    // Normally, each chunk is compared with the mean energy of an history
+    // buffer located right before it. For the first chunks from 0 to hbWidth,
+    // there isnt enough data to work with. So we use the data around the chunks
+    // rather than before them.
+    var eMean = 0;
+    for (var i = 0; i < hbWidth; i++) {
+      eMean += e[i];
+    }
+    eMean /= hbWidth;
+    for (var i = 0; i < hbWidth; i++) {
+      if (e[i] > C * eMean) {
+        beatIdx.push(i);
+      }
+    }
+
+    for (var i = hbWidth; i < e.length; i++) {
       var eMean = 0;
       for(var j = i - hbWidth; j < i; j++) {
         eMean += e[j];
       }
       eMean /= hbWidth;
 
-      if(e[i] > 1.3 * eMean) {
-        tmpIdx.push(i);
+      if(e[i] > C * eMean) {
+        beatIdx.push(i);
       }
     }
 
-    // tmpIdx contains indexes of peaks. It contains lots of contiguous indexes:
-    // tmpIdx[i+1] = tmpIdx[i] + 1 or + 2.
+    // beatIdx contains indexes of peaks. It contains lots of contiguous indexes:
+    // beatIdx[i+1] = beatIdx[i] + 1 or + 2.
     // For each of these groups, we want to keep only one index, the one
     // corresponding to the highest energy (this is the real peak index);
-    for (var i = 0; i < tmpIdx.length - 1; i++) {
-      if(tmpIdx[i + 1] > tmpIdx[i] + 3) {
+    for (var i = 0; i < beatIdx.length - 1; i++) {
+      if(beatIdx[i + 1] > beatIdx[i] + 3) {
         continue;
       }
 
       var j = i + 2;
-      while (j < tmpIdx.length && tmpIdx[j] <= tmpIdx[j - 1] + 3) {
+      while (j < beatIdx.length && beatIdx[j] <= beatIdx[j - 1] + 3) {
         j++;
       }
 
       var maxIdx = i;
       for (var m = i + 1; m < j; m++) {
-        if (e[tmpIdx[m]] > e[tmpIdx[maxIdx]]) {
+        if (e[beatIdx[m]] > e[beatIdx[maxIdx]]) {
           maxIdx = m;
         }
       }
 
-      tmpIdx.splice(i, j - i, tmpIdx[maxIdx]);
+      beatIdx.splice(i, j - i, beatIdx[maxIdx]);
     }
 
-    // translate tmpIdx values into audio frame indexes.
-    for (var i = 0; i < tmpIdx.length; i++) {
-      slicingFrameIndexes[i] = tmpIdx[i] * chunkWidth;
+    return beatIdx;
+  }
+
+  function chunkToFrameIdx(chunkIndexes, chunkWidth) {
+    var result = new Array(chunkIndexes.length);
+    for (var i = 0; i < chunkIndexes.length; i++) {
+      result[i] = chunkIndexes[i] * chunkWidth;
+    }
+    return result;
+  }
+
+
+  function slice() {
+    if (!inputBuffer) {
+      return;
     }
 
-    slicedBuffer = b;
+    // compute the rms for each chunk in the sample.
+    var b = inputBuffer.getChannelData(0);
+    var e = new Array(Math.ceil(b.length / chunkWidth));
+    for (var i = 0; i < e.length; i++) {
+      e[i] = rms(b, i * chunkWidth, chunkWidth);
+    }
+
+    beatIdx = findBeatIndexes(e);
+    // 3. slice!
+
+    beatFrameIndexes = chunkToFrameIdx(beatIdx, chunkWidth);
   };
 
   var slicer = {
@@ -79,7 +109,6 @@ function makeSlicer() {
      * @brief setInputBuffer sets the input buffer of the slicer and slices it.
      * @param b the buffer to set as input and slice.
      */
-
     setInputBuffer: function(b) {
       inputBuffer = b;
       slice();
@@ -124,12 +153,12 @@ function makeSlicer() {
     },
 
     /**
-     * @brief slicingFrameIndexes
+     * @brief beatFrameIndexes
      * @return an array containing the frame indexes of the original buffer
-     * where the slicing occured.
+     * where beats occured.
      */
-    slicingFrameIndexes: function() {
-      return slicingFrameIndexes;
+    beatFrameIndexes: function() {
+      return beatFrameIndexes;
     }
   };
 

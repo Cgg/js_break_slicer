@@ -42,18 +42,28 @@ function makeSlicer() {
       }
     }
 
-    // curate the tmpIdx array : find groups of peaks and keep only one for
-    // each group.
+    // tmpIdx contains indexes of peaks. It contains lots of contiguous indexes:
+    // tmpIdx[i+1] = tmpIdx[i] + 1 or + 2.
+    // For each of these groups, we want to keep only one index, the one
+    // corresponding to the highest energy (this is the real peak index);
     for (var i = 0; i < tmpIdx.length - 1; i++) {
-      if(tmpIdx[i + 1] > tmpIdx[i] + 1) {
+      if(tmpIdx[i + 1] > tmpIdx[i] + 3) {
         continue;
       }
 
       var j = i + 2;
-      while (j < tmpIdx.length && tmpIdx[j] == tmpIdx[j - 1] + 1) {
+      while (j < tmpIdx.length && tmpIdx[j] <= tmpIdx[j - 1] + 3) {
         j++;
       }
-      //tmpIdx.splice(i, j - i);
+
+      var maxIdx = i;
+      for (var m = i + 1; m < j; m++) {
+        if (e[tmpIdx[m]] > e[tmpIdx[maxIdx]]) {
+          maxIdx = m;
+        }
+      }
+
+      tmpIdx.splice(i, j - i, tmpIdx[maxIdx]);
     }
 
     // translate tmpIdx values into audio frame indexes.

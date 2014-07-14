@@ -28,11 +28,8 @@ function makeSlicer() {
     // buffer located right before it. For the first chunks from 0 to hbWidth,
     // there isnt enough data to work with. So we use the data around the chunks
     // rather than before them.
-    var eMean = 0;
-    for (var i = 0; i < hbWidth; i++) {
-      eMean += e[i];
-    }
-    eMean /= hbWidth;
+    var eMean = mean(e, 0, hbWidth);
+
     for (var i = 0; i < hbWidth; i++) {
       if (e[i] > C * eMean) {
         beatIdx.push(i);
@@ -40,11 +37,7 @@ function makeSlicer() {
     }
 
     for (var i = hbWidth; i < e.length; i++) {
-      var eMean = 0;
-      for(var j = i - hbWidth; j < i; j++) {
-        eMean += e[j];
-      }
-      eMean /= hbWidth;
+      var eMean = mean(e, i - hbWidth, hbWidth);
 
       if(e[i] > C * eMean) {
         beatIdx.push(i);

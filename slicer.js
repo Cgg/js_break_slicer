@@ -9,6 +9,7 @@ function makeSlicer() {
   var inputBuffer = null;
   var slicedBuffer = null;
   var beatFrameIndexes = new Array();
+  var slicingFrameIndexes = new Array();
 
   var chunkWidth = 500; // in audio frames
   var hbWidth = 10; // in chunks
@@ -77,6 +78,29 @@ function makeSlicer() {
     return beatIdx;
   }
 
+  function findSlicingIndexes(beatIdx, energyArray) {
+    var slicingIdx = new Array();
+
+    // for each beat look  right for the min energy until the next beat.
+    // dont do that for the last beat, since we go to the end of the buffer
+    // anyway.
+    for (var i = 0; i < beatIdx.length - 1; i++) {
+      var min = energyArray[beatIdx[i]];
+      var minIdx = beatIdx[i];
+
+      for (var m = beatIdx[i] + 1; m < beatIdx[i + 1]; m++) {
+        if (energyArray[m] < min) {
+          min = energyArray[m];
+          minIdx = m;
+        }
+      }
+
+      slicingIdx.push(minIdx);
+    }
+
+    return slicingIdx;
+  }
+
   function chunkToFrameIdx(chunkIndexes, chunkWidth) {
     var result = new Array(chunkIndexes.length);
     for (var i = 0; i < chunkIndexes.length; i++) {
@@ -99,9 +123,11 @@ function makeSlicer() {
     }
 
     beatIdx = findBeatIndexes(e);
+    slicingIdx = findSlicingIndexes(beatIdx, e);
     // 3. slice!
 
     beatFrameIndexes = chunkToFrameIdx(beatIdx, chunkWidth);
+    slicingFrameIndexes = chunkToFrameIdx(slicingIdx, chunkWidth);
   };
 
   var slicer = {
@@ -159,6 +185,10 @@ function makeSlicer() {
      */
     beatFrameIndexes: function() {
       return beatFrameIndexes;
+    },
+
+    slicingFrameIndexes: function() {
+      return slicingFrameIndexes;
     }
   };
 

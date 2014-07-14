@@ -39,6 +39,7 @@ function redrawOverlay() {
 
   paintFramesIndexes(overlayCvs, slicer.beatFrameIndexes(),
     bufLength, 'rgba(255, 0, 0, 0.7)');
+  paintAlternateStripes(overlayCvs, slicer.slicingFrameIndexes(), bufLength);
 }
 
 function loadSample(uneURL) {
@@ -47,7 +48,7 @@ function loadSample(uneURL) {
   xhr.responseType = 'arraybuffer';
   xhr.onload = function(e) {
     audioCtx.decodeAudioData(xhr.response, function(data){
-      slicer.setChunkWidth(Math.floor(data.length / inputBufferCvs.width));
+      slicer.setChunkWidth(400);
       slicer.setInputBuffer(data);
 
       paintBuffer(inputBufferCvs, slicer.inputBuffer());

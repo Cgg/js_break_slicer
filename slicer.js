@@ -13,7 +13,6 @@ function makeSlicer() {
 
   var chunkWidth = 500; // in audio frames
   var hbWidth = 10; // in chunks
-  var C = 1.4;
 
   // given an array of energy values (RMS), this function will find the peaks in
   // it and return an array containing the indexes of these peaks.
@@ -29,6 +28,9 @@ function makeSlicer() {
     // there isnt enough data to work with. So we use the data around the chunks
     // rather than before them.
     var eMean = mean(e, 0, hbWidth);
+    var V = variance(e, 0, hbWidth, eMean);
+    var C = (-0.0025714 * V) + 1.51422857;
+    console.log(C);
 
     for (var i = 0; i < hbWidth; i++) {
       if (e[i] > C * eMean) {
@@ -38,6 +40,9 @@ function makeSlicer() {
 
     for (var i = hbWidth; i < e.length; i++) {
       var eMean = mean(e, i - hbWidth, hbWidth);
+      var V = variance(e, i - hbWidth, hbWidth, eMean);
+      var C = (-0.0025714 * V) + 1.51422857;
+      console.log(C);
 
       if(e[i] > C * eMean) {
         beatIdx.push(i);

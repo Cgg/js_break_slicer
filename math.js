@@ -50,3 +50,34 @@ function mean(values, start, length) {
   return result;
 }
 
+/**
+ * @brief variance compute the variance for a portion of an array of values.
+ * @param values the array holding the values.
+ * @param start the starting point of the portion whose variance is calculated.
+ * @param length the length of the portion whose variance is calculated.
+ * @param mean the mean of the portion of the array, if you had calculated it
+ * beforehand. Otherwise it will be calculated.
+ * @note if start and length are omitted then the variance is calculated on the
+ * whole array.
+ * @note the mean is always recalculated if start or length are undefined.
+ * @return the variance.
+ */
+function variance(values, start, length, mean) {
+  var recomputeMean = (start === undefined || length === undefined ||
+    mean === undefined);
+
+  start = d(start, 0);
+  length = d(length, values.length);
+  if(recomputeMean) {
+    mean = mean(values, start, length);
+  }
+
+  var V = 0;
+  for (var i = 0; i < length; i++) {
+    V = Math.pow((values[start + i] - mean), 2);
+  }
+  V /= length;
+
+  return V;
+}
+

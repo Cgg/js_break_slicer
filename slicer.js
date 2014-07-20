@@ -30,7 +30,6 @@ function makeSlicer() {
     var eMean = mean(e, 0, hbWidth);
     var V = variance(e, 0, hbWidth, eMean);
     var C = (-0.0025714 * V) + 1.51422857;
-    console.log(C);
 
     for (var i = 0; i < hbWidth; i++) {
       if (e[i] > C * eMean) {
@@ -42,7 +41,6 @@ function makeSlicer() {
       var eMean = mean(e, i - hbWidth, hbWidth);
       var V = variance(e, i - hbWidth, hbWidth, eMean);
       var C = (-0.0025714 * V) + 1.51422857;
-      console.log(C);
 
       if(e[i] > C * eMean) {
         beatIdx.push(i);

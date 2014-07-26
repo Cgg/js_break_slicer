@@ -105,7 +105,6 @@ function makeSlicer() {
     return result;
   }
 
-
   function slice() {
     if (!inputBuffer) {
       return;

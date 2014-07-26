@@ -80,7 +80,7 @@ function paintAlternateStripes(canvas, stripesBoundaryIndexes, bufLength) {
   var rightBound;
   var i = 0;
   for (i = 0; i < stripesBoundaryIndexes.length; i++) {
-    rightBound = fToPix(stripesBoundaryIndexes[i]);
+    rightBound = fToPix(stripesBoundaryIndexes[i].endIdx);
 
     ctx.fillStyle = (i % 2 ? c1 : c2);
     ctx.fillRect(leftBound, 0, rightBound - leftBound, canvas.height);

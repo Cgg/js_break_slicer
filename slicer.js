@@ -7,9 +7,12 @@
  */
 function makeSlicer() {
   var inputBuffer = null;
-  var slicedBuffer = null;
   var beatFrameIndexes = new Array();
-  var slicingFrameIndexes = new Array();
+  var slices = new Array();
+
+  var slicedBuffer = null;
+  var slicedBeatFrameIndexes = new Array();
+  var slicedSlicingFrameIndex = new Array();
 
   var chunkWidth = 500; // in audio frames
   var hbWidth = 10; // in chunks
@@ -75,12 +78,22 @@ function makeSlicer() {
   }
 
   function findSlicingIndexes(beatIdx, energyArray) {
-    var slicingIdx = new Array();
+    var slices = new Array();
 
     // for each beat look  right for the min energy until the next beat.
     // dont do that for the last beat, since we go to the end of the buffer
     // anyway.
-    for (var i = 0; i < beatIdx.length - 1; i++) {
+    var min = energyArray[beatIdx[0]];
+    var minIdx = beatIdx[0];
+    for (var m = beatIdx[0] + 1; m < beatIdx[1]; m++) {
+      if (energyArray[m] < min) {
+        min = energyArray[m];
+        minIdx = m;
+      }
+    }
+    slices.push({beginIdx: 0, endIdx: minIdx})
+
+    for (var i = 1; i < beatIdx.length - 1; i++) {
       var min = energyArray[beatIdx[i]];
       var minIdx = beatIdx[i];
 
@@ -91,10 +104,14 @@ function makeSlicer() {
         }
       }
 
-      slicingIdx.push(minIdx);
+      slices.push({beginIdx: slices[i - 1].endIdx + 1,
+        endIdx: minIdx})
     }
 
-    return slicingIdx;
+    slices.push({beginIdx: slices[slices.length - 1].endIdx + 1,
+      endIdx: energyArray.length - 1})
+
+    return slices;
   }
 
   function chunkToFrameIdx(chunkIndexes, chunkWidth) {
@@ -102,6 +119,15 @@ function makeSlicer() {
     for (var i = 0; i < chunkIndexes.length; i++) {
       result[i] = chunkIndexes[i] * chunkWidth;
     }
+    return result;
+  }
+  function convertSlices(slices, chunkWidth) {
+    var result = new Array(slices.length);
+    for (var i = 0; i < slices.length; ++i) {
+      result[i] = {beginIdx: slices[i].beginIdx * chunkWidth,
+        endIdx: slices[i].endIdx * chunkWidth};
+    }
+
     return result;
   }
 
@@ -118,11 +144,12 @@ function makeSlicer() {
     }
 
     beatIdx = findBeatIndexes(e);
-    slicingIdx = findSlicingIndexes(beatIdx, e);
-    // 3. slice!
+    slices = findSlicingIndexes(beatIdx, e);
+
+    // slice :
 
     beatFrameIndexes = chunkToFrameIdx(beatIdx, chunkWidth);
-    slicingFrameIndexes = chunkToFrameIdx(slicingIdx, chunkWidth);
+    slices = convertSlices(slices, chunkWidth);
   };
 
   var slicer = {
@@ -182,8 +209,8 @@ function makeSlicer() {
       return beatFrameIndexes;
     },
 
-    slicingFrameIndexes: function() {
-      return slicingFrameIndexes;
+    slices: function() {
+      return slices;
     }
   };
 

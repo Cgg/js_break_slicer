@@ -45,7 +45,7 @@ function redrawOverlay() {
 
   paintFramesIndexes(sliceOverlayCvs, slicer.beatFrameIndexes(),
     bufLength, 'rgba(255, 0, 0, 0.7)');
-  paintAlternateStripes(sliceOverlayCvs, slicer.slicingFrameIndexes(),
+  paintAlternateStripes(sliceOverlayCvs, slicer.slices(),
     bufLength);
 }
 

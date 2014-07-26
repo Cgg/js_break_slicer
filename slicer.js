@@ -1,13 +1,11 @@
 /**
  * @brief makeSlicer
  * Make a buffer slicer. This takes an input buffer (setInputBuffer), finds the
- * slicing points on drum kicks (that you can retrieve with
- * beatFrameIndexes) and randomly rearranges the slices. This produces the
- * sliced buffer that you can retrieve with slicedBuffer.
+ * slicing points on drum kicks and randomly rearranges the slices. This
+ * produces the sliced buffer that you can retrieve with slicedBuffer.
  */
 function makeSlicer() {
   var inputBuffer = null;
-  var beatFrameIndexes = new Array();
   var slices = new Array();
 
   var slicedBuffer = null;
@@ -91,7 +89,7 @@ function makeSlicer() {
         minIdx = m;
       }
     }
-    slices.push({beginIdx: 0, endIdx: minIdx})
+    slices.push({beginIdx: 0, endIdx: minIdx, beatIdx: beatIdx[0]})
 
     for (var i = 1; i < beatIdx.length - 1; i++) {
       var min = energyArray[beatIdx[i]];
@@ -105,11 +103,11 @@ function makeSlicer() {
       }
 
       slices.push({beginIdx: slices[i - 1].endIdx + 1,
-        endIdx: minIdx})
+        endIdx: minIdx, beatIdx: beatIdx[i]})
     }
 
     slices.push({beginIdx: slices[slices.length - 1].endIdx + 1,
-      endIdx: energyArray.length - 1})
+      endIdx: energyArray.length - 1, beatIdx: beatIdx[beatIdx.length - 1]})
 
     return slices;
   }
@@ -124,8 +122,10 @@ function makeSlicer() {
   function convertSlices(slices, chunkWidth) {
     var result = new Array(slices.length);
     for (var i = 0; i < slices.length; ++i) {
-      result[i] = {beginIdx: slices[i].beginIdx * chunkWidth,
-        endIdx: slices[i].endIdx * chunkWidth};
+      result[i] = {
+        beginIdx: slices[i].beginIdx * chunkWidth,
+        endIdx: slices[i].endIdx * chunkWidth,
+        beatIdx: slices[i].beatIdx * chunkWidth};
     }
 
     return result;
@@ -148,7 +148,6 @@ function makeSlicer() {
 
     // slice :
 
-    beatFrameIndexes = chunkToFrameIdx(beatIdx, chunkWidth);
     slices = convertSlices(slices, chunkWidth);
   };
 
@@ -198,15 +197,6 @@ function makeSlicer() {
      */
     slicedBuffer: function() {
       return slicedBuffer;
-    },
-
-    /**
-     * @brief beatFrameIndexes
-     * @return an array containing the frame indexes of the original buffer
-     * where beats occured.
-     */
-    beatFrameIndexes: function() {
-      return beatFrameIndexes;
     },
 
     slices: function() {

@@ -42,9 +42,15 @@ function redrawOverlay() {
     0, 0, sliceOverlayCvs.width, sliceOverlayCvs.height);
 
   var bufLength = slicer.inputBuffer().length;
+  var slices = slicer.slices();
 
-  paintFramesIndexes(sliceOverlayCvs, slicer.beatFrameIndexes(),
-    bufLength, 'rgba(255, 0, 0, 0.7)');
+  var beatIdx = new Array(slices.length);
+  for (var i = 0; i < slices.length; i++) {
+    beatIdx[i] = slices[i].beatIdx;
+  }
+
+  paintFramesIndexes(sliceOverlayCvs, beatIdx, bufLength,
+    'rgba(255, 0, 0, 0.7)');
   paintAlternateStripes(sliceOverlayCvs, slicer.slices(),
     bufLength);
 }

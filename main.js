@@ -62,7 +62,7 @@ function updateSlices() {
   var bufLength = inputBuffer.length;
 
   paintFramesIndexes(sliceOverlayCvs, beatIdx, bufLength,
-    'rgba(255, 0, 0, 0.7)');
+    'rgba(255, 0, 0, 0.5)');
   paintStripes(sliceOverlayCvs, slices, stripesColors,
     bufLength);
 }

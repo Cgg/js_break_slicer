@@ -9,7 +9,30 @@ function makePlayer(audioContext) {
   var audioSource = null;
   var playing = false;
 
+  var currentProgress = 0;
+  var progressChunk = 0;
+  var progressUpdateRate = 1000/25.0;
+  var progressChangedSignal = makeSignal();
+  var updateProgressInterval = -1
+
+  var updateProgress = function() {
+    currentProgress += progressChunk;
+    if(currentProgress > 1) {
+      currentProgress = 0
+    }
+    progressChangedSignal.trigger(currentProgress)
+  }
+
   var player = {
+    /**
+     * @brief progressChangedSignal signal sent when the progress of the
+     * playback has changed.
+     * @param: current progress between 0 and 1.
+     */
+    progressChangedSignal: function() {
+      return progressChangedSignal;
+    },
+
     /**
      * @brief isPlaying
      * @return true if the player is playing, false otherwise.
@@ -30,6 +53,10 @@ function makePlayer(audioContext) {
         return false;
       }
 
+      currentProgress = 0;
+      progressChunk = 1 / (buf.duration / (progressUpdateRate / 1000));
+      updateProgressInterval = setInterval(updateProgress, progressUpdateRate)
+
       audioSource = audioCtx.createBufferSource();
       audioSource.buffer = buf;
       audioSource.loop = true;
@@ -45,6 +72,8 @@ function makePlayer(audioContext) {
      * @brief stopPlayback stop the current playback if any.
      */
     stopPlayback: function() {
+      clearInterval(updateProgressInterval);
+      progressChangedSignal.trigger(0);
       if (audioSource) {
         audioSource.stop(0);
         audioSource = null;

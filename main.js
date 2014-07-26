@@ -10,9 +10,15 @@ var playButton = document.getElementById('play');
 var inputBufferCvs = document.getElementById('visu');
 inputBufferCvs.width = window.innerWidth - 10;
 inputBufferCvs.height = 256;
-var overlayCvs = document.getElementById('overlay');
-overlayCvs.width = inputBufferCvs.width;
-overlayCvs.height = inputBufferCvs.height;
+var sliceOverlayCvs = document.getElementById('slice_overlay');
+sliceOverlayCvs.width = inputBufferCvs.width;
+sliceOverlayCvs.height = inputBufferCvs.height;
+var progOverlayCvs = document.getElementById('prog_overlay');
+progOverlayCvs.width = inputBufferCvs.width;
+progOverlayCvs.height = 3;
+
+var progressPainter = makeProgressPainter(progOverlayCvs)
+player.progressChangedSignal().connect(progressPainter.setProgress)
 
 sampleCombo.addEventListener('change',
   function(e) {
@@ -32,14 +38,15 @@ playButton.addEventListener("click", function(e) {
 });
 
 function redrawOverlay() {
-  overlayCvs.getContext('2d').clearRect(
-    0, 0, overlayCvs.width, overlayCvs.height);
+  sliceOverlayCvs.getContext('2d').clearRect(
+    0, 0, sliceOverlayCvs.width, sliceOverlayCvs.height);
 
   var bufLength = slicer.inputBuffer().length;
 
-  paintFramesIndexes(overlayCvs, slicer.beatFrameIndexes(),
+  paintFramesIndexes(sliceOverlayCvs, slicer.beatFrameIndexes(),
     bufLength, 'rgba(255, 0, 0, 0.7)');
-  paintAlternateStripes(overlayCvs, slicer.slicingFrameIndexes(), bufLength);
+  paintAlternateStripes(sliceOverlayCvs, slicer.slicingFrameIndexes(),
+    bufLength);
 }
 
 function loadSample(uneURL) {

@@ -2,11 +2,13 @@
 <head>
 <meta charset='utf-8'>
 <link rel="stylesheet" type="text/css" href="style.css">
+<script src="signal.js"></script>
 <script src="main.js"></script>
 <script src="player.js"></script>
 <script src="slicer.js"></script>
 <script src="math.js"></script>
 <script src="paint_buffer.js"></script>
+<script src="progress_painter.js"></script>
 
 <title>JS Break Slicer</title>
 </head>
@@ -35,7 +37,8 @@ around those beats.
 
 <div id="canvasdiv">
   <canvas class="cvs" id="visu">not supported.</canvas>
-  <canvas class="cvs" id="overlay">not supported.</canvas>
+  <canvas class="cvs" id="slice_overlay">not supported.</canvas>
+  <canvas class="cvs" id="prog_overlay">not supported.</canvas>
 </div>
 
 </body>

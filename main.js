@@ -43,6 +43,14 @@ playButton.addEventListener("click", function(e) {
 function updateSlices() {
   slices = findSlices(inputBuffer, 400, 10);
 
+  var stripesColors = new Array(slices.length);
+  var hChunk = 270 / stripesColors.length;
+  var curH = 0;
+  for (var i = 0; i < stripesColors.length; ++i) {
+    stripesColors[i] = 'hsla(' + curH + ', 60%, 60%, 0.2)';
+    curH += hChunk;
+  }
+
   // redraw slices overlay
   var beatIdx = new Array(slices.length);
   for (var i = 0; i < slices.length; i++) {
@@ -55,7 +63,7 @@ function updateSlices() {
 
   paintFramesIndexes(sliceOverlayCvs, beatIdx, bufLength,
     'rgba(255, 0, 0, 0.7)');
-  paintAlternateStripes(sliceOverlayCvs, slices,
+  paintStripes(sliceOverlayCvs, slices, stripesColors,
     bufLength);
 }
 
@@ -66,8 +74,8 @@ function loadSample(uneURL) {
   xhr.onload = function(e) {
     audioCtx.decodeAudioData(xhr.response, function(data){
       inputBuffer = data;
-      updateSlices();
       paintBuffer(inputBufferCvs, data);
+      updateSlices();
       if (player.isPlaying()) {
         player.startPlayback(inputBuffer);
       }

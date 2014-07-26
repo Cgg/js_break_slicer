@@ -66,13 +66,10 @@ function paintFramesIndexes(canvas, frameIndexes, bufferLength, color) {
   ctx.restore();
 }
 
-function paintAlternateStripes(canvas, stripesBoundaryIndexes, bufLength) {
+function paintStripes(canvas, stripesBoundaryIndexes, stripesColors, bufLength) {
   var ctx = canvas.getContext('2d');
   ctx.save();
   ctx.strokeStyle = 'rgab(0, 0, 0, 0)';
-
-  var c1 = 'rgba(0, 255, 0, 0.2)';
-  var c2 = 'rgba(0, 0, 255, 0.2)';
 
   fToPix = makeFrameToPixConverter(bufLength, canvas.width);
 
@@ -82,14 +79,11 @@ function paintAlternateStripes(canvas, stripesBoundaryIndexes, bufLength) {
   for (i = 0; i < stripesBoundaryIndexes.length; i++) {
     rightBound = fToPix(stripesBoundaryIndexes[i].endIdx);
 
-    ctx.fillStyle = (i % 2 ? c1 : c2);
+    ctx.fillStyle = stripesColors[i];
     ctx.fillRect(leftBound, 0, rightBound - leftBound, canvas.height);
 
     leftBound = rightBound;
   }
-
-  ctx.fillStyle = (i % 2 ? c1 : c2);
-  ctx.fillRect(leftBound, 0, canvas.width - leftBound, canvas.height);
 
   ctx.restore();
 }

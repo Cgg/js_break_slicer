@@ -1,24 +1,29 @@
 /**
- * @brief makeSlicer
- * Make a buffer slicer. This takes an input buffer (setInputBuffer), finds the
- * slicing points on drum kicks and randomly rearranges the slices. This
- * produces the sliced buffer that you can retrieve with slicedBuffer.
+ * @brief findSlices finds the slices in an input audio buffer.
+ * @param inputBuffer the audio buffer to process
+ * @param chunkWidth the number of audio frames in each chunk, for the beat
+ * detection algorithm.
+ * @param historyBufferWidth the width of the history buffer for the beat
+ * detection. Exprimed in number of chunks (see above).
+ * @return an array containing the slices found from the input buffer.
+ *
+ * A slice is a single beat and its surroundings. The sliceFinder returns an
+ * array of slices, where each slice includes a start and end index, as well as
+ * a beat index. All indexes in the returned slices are exprimed in audio frame
+ * indexes from the input buffer.
  */
-function makeSlicer() {
-  var inputBuffer = null;
+function findSlices(inputBuffer, chunkWidth, historyBufferWidth) {
   var slices = new Array();
 
   var slicedBuffer = null;
   var slicedBeatFrameIndexes = new Array();
   var slicedSlicingFrameIndex = new Array();
 
-  var chunkWidth = 500; // in audio frames
-  var hbWidth = 10; // in chunks
-
   // given an array of energy values (RMS), this function will find the peaks in
   // it and return an array containing the indexes of these peaks.
   function findBeatIndexes(energyArray) {
     var e = energyArray;
+    var hbWidth = historyBufferWidth;
 
     // compare each chunk's rms with the mean rms of the previous history and
     // find the peaks (stored in beatIdx).
@@ -75,6 +80,9 @@ function makeSlicer() {
     return beatIdx;
   }
 
+  // given an array of beats indexes pointing to places in the energy array
+  // passed as the second parameter, find the slices surrounding each beat and
+  // return an array of slices.
   function findSlicingIndexes(beatIdx, energyArray) {
     var slices = new Array();
 
@@ -112,98 +120,26 @@ function makeSlicer() {
     return slices;
   }
 
-  function chunkToFrameIdx(chunkIndexes, chunkWidth) {
-    var result = new Array(chunkIndexes.length);
-    for (var i = 0; i < chunkIndexes.length; i++) {
-      result[i] = chunkIndexes[i] * chunkWidth;
-    }
-    return result;
-  }
-  function convertSlices(slices, chunkWidth) {
-    var result = new Array(slices.length);
-    for (var i = 0; i < slices.length; ++i) {
-      result[i] = {
-        beginIdx: slices[i].beginIdx * chunkWidth,
-        endIdx: slices[i].endIdx * chunkWidth,
-        beatIdx: slices[i].beatIdx * chunkWidth};
-    }
-
-    return result;
+  if (!inputBuffer) {
+    return;
   }
 
-  function slice() {
-    if (!inputBuffer) {
-      return;
-    }
+  // compute the rms for each chunk in the sample.
+  var b = inputBuffer.getChannelData(0);
+  var e = new Array(Math.ceil(b.length / chunkWidth));
+  for (var i = 0; i < e.length; i++) {
+    e[i] = rms(b, i * chunkWidth, chunkWidth);
+  }
 
-    // compute the rms for each chunk in the sample.
-    var b = inputBuffer.getChannelData(0);
-    var e = new Array(Math.ceil(b.length / chunkWidth));
-    for (var i = 0; i < e.length; i++) {
-      e[i] = rms(b, i * chunkWidth, chunkWidth);
-    }
+  beatIdx = findBeatIndexes(e);
+  slices = findSlicingIndexes(beatIdx, e);
 
-    beatIdx = findBeatIndexes(e);
-    slices = findSlicingIndexes(beatIdx, e);
+  // convert each slice indexes back to audio frame indexes
+  slices.forEach(function(s) {
+    s.beginIdx = s.beginIdx * chunkWidth;
+    s.endIdx = s.endIdx * chunkWidth;
+    s.beatIdx = s.beatIdx * chunkWidth;
+  });
 
-    // slice :
-
-    slices = convertSlices(slices, chunkWidth);
-  };
-
-  var slicer = {
-    /**
-     * @brief setInputBuffer sets the input buffer of the slicer and slices it.
-     * @param b the buffer to set as input and slice.
-     */
-    setInputBuffer: function(b) {
-      inputBuffer = b;
-      slice();
-    },
-
-    chunkWidth: function() {
-      return chunkWidth;
-    },
-
-    setChunkWidth: function(width) {
-      if (chunkWidth != width) {
-        chunkWidth = width;
-        slice();
-      }
-    },
-
-    historyBufferWidth: function() {
-      return hbWidth;
-    },
-
-    setHistoryBufferWidth: function(width) {
-      if (width != hbWidth) {
-        hbWidth = width;
-        slice();
-      }
-    },
-
-    /**
-     * @brief inputBuffer getter for the vanilla input buffer.
-     * @return the input buffer.
-     */
-    inputBuffer: function() {
-      return inputBuffer;
-    },
-
-    /**
-     * @brief slicedBuffer getter for the sliced and rearranged buffer.
-     * @return the sliced buffer.
-     */
-    slicedBuffer: function() {
-      return slicedBuffer;
-    },
-
-    slices: function() {
-      return slices;
-    }
-  };
-
-  return slicer;
+  return slices;
 }
-

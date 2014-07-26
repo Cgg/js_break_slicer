@@ -2,7 +2,10 @@ window.onload = function()
 {
 var audioCtx = new AudioContext();
 var player = makePlayer(audioCtx);
-var slicer = makeSlicer();
+
+var inputBuffer;
+var slices;
+var outputBuffer;
 
 var sampleCombo = document.getElementById('sample_combo');
 var playButton = document.getElementById('play');
@@ -32,26 +35,27 @@ playButton.addEventListener("click", function(e) {
   if (player.isPlaying()) {
     player.stopPlayback();
   }
-  else if (player.startPlayback(slicer.inputBuffer())) {
+  else if (player.startPlayback(inputBuffer)) {
     playButton.innerHTML = "Stop";
   }
 });
 
-function redrawOverlay() {
-  sliceOverlayCvs.getContext('2d').clearRect(
-    0, 0, sliceOverlayCvs.width, sliceOverlayCvs.height);
+function updateSlices() {
+  slices = findSlices(inputBuffer, 400, 10);
 
-  var bufLength = slicer.inputBuffer().length;
-  var slices = slicer.slices();
-
+  // redraw slices overlay
   var beatIdx = new Array(slices.length);
   for (var i = 0; i < slices.length; i++) {
     beatIdx[i] = slices[i].beatIdx;
   }
 
+  sliceOverlayCvs.getContext('2d').clearRect(
+    0, 0, sliceOverlayCvs.width, sliceOverlayCvs.height);
+  var bufLength = inputBuffer.length;
+
   paintFramesIndexes(sliceOverlayCvs, beatIdx, bufLength,
     'rgba(255, 0, 0, 0.7)');
-  paintAlternateStripes(sliceOverlayCvs, slicer.slices(),
+  paintAlternateStripes(sliceOverlayCvs, slices,
     bufLength);
 }
 
@@ -61,13 +65,11 @@ function loadSample(uneURL) {
   xhr.responseType = 'arraybuffer';
   xhr.onload = function(e) {
     audioCtx.decodeAudioData(xhr.response, function(data){
-      slicer.setChunkWidth(400);
-      slicer.setInputBuffer(data);
-
-      paintBuffer(inputBufferCvs, slicer.inputBuffer());
-      redrawOverlay();
+      inputBuffer = data;
+      updateSlices();
+      paintBuffer(inputBufferCvs, data);
       if (player.isPlaying()) {
-        player.startPlayback(slicer.inputBuffer());
+        player.startPlayback(inputBuffer);
       }
     });
   }

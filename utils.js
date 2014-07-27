@@ -30,7 +30,7 @@ function shuffle(array) {
  * @param audioBuffer the buffer to clone.
  * @return the cloned buffer.
  */
-function cloneAudioBuffer(audioContext, audioBuffer) {
+function cloneAudioBuffer(audioContext, inBuffer) {
   var outBuffer = audioContext.createBuffer(
     inBuffer.numberOfChannels,
     inBuffer.length,

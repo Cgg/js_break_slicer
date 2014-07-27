@@ -64,6 +64,7 @@ function loadSample(uneURL) {
   xhr.onload = function(e) {
     audioCtx.decodeAudioData(xhr.response, function(data){
       inputBuffer = data;
+      outputBuffer = cloneAudioBuffer(audioCtx, inputBuffer);
       paintBuffer(inputBufferCvs, data);
       updateSlices();
       if (player.isPlaying()) {

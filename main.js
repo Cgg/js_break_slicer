@@ -6,6 +6,7 @@ var player = makePlayer(audioCtx);
 var inputBuffer;
 var slices;
 var outputBuffer;
+var randomizedSlices;
 
 var sampleCombo = document.getElementById('sample_combo');
 var playButton = document.getElementById('play');
@@ -56,6 +57,26 @@ function updateSlices() {
 
   // randomize();
 }
+
+//function randomize() {
+  //var indexes = new Array(slices.length);
+  //for (var i = 0; i < slices.length; i++) {
+    //indexes[i] = i;
+  //}
+  //shuffle(indexes);
+
+  //randomizedSlices = new Array(slices.length);
+  //for (var i = 0; i < indexes.length; i++) {
+    //randomizedSlices[i] = slices[indexes[i]];
+  //}
+
+  //build outputBuffer
+  //paintBuffer(outputBufferCvs, outputBuffer);
+
+  //var cvs = outputBufferSlicesOverlayCvs;
+  //cvs.getContext('2d').clearRect(0, 0, cvs.width, cvs.height);
+  //paintSlices(cvs, randomizedSlices, bufLength, 'rgba(255, 0, 0, 0.5)');
+//}
 
 function loadSample(uneURL) {
   var xhr = new XMLHttpRequest;

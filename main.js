@@ -44,11 +44,12 @@ function updateSlices() {
   slices = findSlices(inputBuffer, 400, 10);
 
   var stripesColors = new Array(slices.length);
-  var hChunk = 360 / (stripesColors.length);
+  var hChunk = 360/8;
   var curH = 0;
   for (var i = 0; i < stripesColors.length; ++i) {
-    stripesColors[i] = 'hsla(' + curH + ', 60%, 60%, 0.2)';
-    curH += hChunk * 5;
+    stripesColors[i] = 'hsla(' + curH + ', 100%, 50%, 0.2)';
+    curH += hChunk;
+  }
   }
 
   // redraw slices overlay

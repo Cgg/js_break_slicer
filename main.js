@@ -50,7 +50,6 @@ function updateSlices() {
     stripesColors[i] = 'hsla(' + curH + ', 100%, 50%, 0.2)';
     curH += hChunk;
   }
-  }
 
   // redraw slices overlay
   var beatIdx = new Array(slices.length);

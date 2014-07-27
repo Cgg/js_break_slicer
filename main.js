@@ -38,7 +38,7 @@ playButton.addEventListener("click", function(e) {
   if (player.isPlaying()) {
     player.stopPlayback();
   }
-  else if (player.startPlayback(inputBuffer)) {
+  else if (player.startPlayback(outputBuffer)) {
     playButton.innerHTML = "Stop";
   }
 });
@@ -111,7 +111,7 @@ function loadSample(uneURL) {
       paintBuffer(inputBufferCvs, data);
       updateSlices();
       if (player.isPlaying()) {
-        player.startPlayback(inputBuffer);
+        player.startPlayback(outputBuffer);
       }
     });
   }

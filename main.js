@@ -23,10 +23,6 @@ outputBufferCvs.width = inputBufferCvs.width;
 var outputOverlayCvs = document.getElementById('output_overlay_canvas');
 outputOverlayCvs.width = inputBufferCvs.width;
 
-outputBufferCvs.getContext('2d').fillStyle = 'rgba(0, 0, 0, 0.5)';
-outputBufferCvs.getContext('2d').fillRect(0, 0, outputBufferCvs.width,
-    outputBufferCvs.height);
-
 var progressPainter = makeProgressPainter(progOverlayCvs)
 player.progressChangedSignal().connect(progressPainter.setProgress)
 
@@ -50,7 +46,7 @@ playButton.addEventListener("click", function(e) {
 function updateSlices() {
   slices = findSlices(inputBuffer, 400, 10);
 
-  var hChunk = 360/8;
+  var hChunk = 360/slices.length;
   var curH = 0;
   for (var i = 0; i < slices.length; ++i) {
     slices[i].color = 'hsla(' + curH + ', 100%, 50%, 0.2)';
@@ -72,16 +68,36 @@ function randomize() {
   shuffle(indexes);
 
   randomizedSlices = new Array(slices.length);
+  var inp = inputBuffer.getChannelData(0);
+  var out = outputBuffer.getChannelData(0);
+  var outputOffset = 0;
+
   for (var i = 0; i < indexes.length; i++) {
-    randomizedSlices[i] = slices[indexes[i]];
+    randomizedSlices[i] = {
+      beginIdx: slices[indexes[i]].beginIdx,
+      endIdx: slices[indexes[i]].endIdx,
+      beatIdx: slices[indexes[i]].beatIdx,
+      color: slices[indexes[i]].color
+    };
+
+    var beginIdx = randomizedSlices[i].beginIdx;
+    var curSliceLength = randomizedSlices[i].endIdx - beginIdx + 1;
+    for (var j = outputOffset; j < outputOffset + curSliceLength; j++) {
+      out[j] = inp[beginIdx + j - outputOffset];
+    }
+    var beatDist = randomizedSlices[i].beatIdx - randomizedSlices[i].beginIdx;
+    randomizedSlices[i].beginIdx = outputOffset;
+    randomizedSlices[i].beatIdx = randomizedSlices[i].beginIdx + beatDist;
+    randomizedSlices[i].endIdx = randomizedSlices[i].beginIdx + curSliceLength - 1;
+
+    outputOffset += curSliceLength;
   }
 
-  //build outputBuffer
-  //paintBuffer(outputBufferCvs, outputBuffer);
+  paintBuffer(outputBufferCvs, outputBuffer);
 
-  //var cvs = outputBufferSlicesOverlayCvs;
-  //cvs.getContext('2d').clearRect(0, 0, cvs.width, cvs.height);
-  //paintSlices(cvs, randomizedSlices, bufLength, 'rgba(255, 0, 0, 0.5)');
+  var cvs = outputOverlayCvs;
+  cvs.getContext('2d').clearRect(0, 0, cvs.width, cvs.height);
+  paintSlices(cvs, randomizedSlices, outputBuffer.length, 'rgba(255, 0, 0, 0.5)');
 }
 
 function loadSample(uneURL) {

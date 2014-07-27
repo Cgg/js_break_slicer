@@ -13,13 +13,19 @@ var playButton = document.getElementById('play');
 
 var inputBufferCvs = document.getElementById('visu');
 inputBufferCvs.width = window.innerWidth - 10;
-inputBufferCvs.height = 256;
 var sliceOverlayCvs = document.getElementById('slice_overlay');
 sliceOverlayCvs.width = inputBufferCvs.width;
-sliceOverlayCvs.height = inputBufferCvs.height;
 var progOverlayCvs = document.getElementById('prog_overlay');
 progOverlayCvs.width = inputBufferCvs.width;
-progOverlayCvs.height = 3;
+
+var outputBufferCvs = document.getElementById('output_buffer_canvas');
+outputBufferCvs.width = inputBufferCvs.width;
+var outputOverlayCvs = document.getElementById('output_overlay_canvas');
+outputOverlayCvs.width = inputBufferCvs.width;
+
+outputBufferCvs.getContext('2d').fillStyle = 'rgba(0, 0, 0, 0.5)';
+outputBufferCvs.getContext('2d').fillRect(0, 0, outputBufferCvs.width,
+    outputBufferCvs.height);
 
 var progressPainter = makeProgressPainter(progOverlayCvs)
 player.progressChangedSignal().connect(progressPainter.setProgress)

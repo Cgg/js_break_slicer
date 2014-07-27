@@ -1,5 +1,6 @@
-#canvasdiv {
+.cvsdiv {
   position: relative;
+  height: 256px;
 }
 
 .cvs {
@@ -20,3 +21,10 @@
   z-index: 2;
 }
 
+#output_buffer_canvas {
+  z-index: 0;
+}
+
+#output_overlay_canvas {
+  z-index: 1;
+}

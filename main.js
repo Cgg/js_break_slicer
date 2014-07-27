@@ -43,28 +43,18 @@ playButton.addEventListener("click", function(e) {
 function updateSlices() {
   slices = findSlices(inputBuffer, 400, 10);
 
-  var stripesColors = new Array(slices.length);
   var hChunk = 360/8;
   var curH = 0;
-  for (var i = 0; i < stripesColors.length; ++i) {
-    stripesColors[i] = 'hsla(' + curH + ', 100%, 50%, 0.2)';
+  for (var i = 0; i < slices.length; ++i) {
+    slices[i].color = 'hsla(' + curH + ', 100%, 50%, 0.2)';
     curH += hChunk;
-  }
-
-  // redraw slices overlay
-  var beatIdx = new Array(slices.length);
-  for (var i = 0; i < slices.length; i++) {
-    beatIdx[i] = slices[i].beatIdx;
   }
 
   sliceOverlayCvs.getContext('2d').clearRect(
     0, 0, sliceOverlayCvs.width, sliceOverlayCvs.height);
-  var bufLength = inputBuffer.length;
+  paintSlices(sliceOverlayCvs, slices, inputBuffer.length, 'rgba(255, 0, 0, 0.5)');
 
-  paintFramesIndexes(sliceOverlayCvs, beatIdx, bufLength,
-    'rgba(255, 0, 0, 0.5)');
-  paintStripes(sliceOverlayCvs, slices, stripesColors,
-    bufLength);
+  // randomize();
 }
 
 function loadSample(uneURL) {

@@ -49,42 +49,35 @@ function makeFrameToPixConverter(bufferLength, canvasWidth) {
   }
 }
 
-function paintFramesIndexes(canvas, frameIndexes, bufferLength, color) {
+function paintSlices(canvas, slices, bufLength, beatColor) {
+  fToPix = makeFrameToPixConverter(bufLength, canvas.width);
+
   var ctx = canvas.getContext('2d');
   ctx.save();
-  ctx.strokeStyle = color;
 
-  fToPix = makeFrameToPixConverter(bufferLength, canvas.width);
+  // paint the beats indexes
+  ctx.strokeStyle = beatColor;
 
   ctx.beginPath();
-  for (var i = 0; i < frameIndexes.length; i++) {
-    ctx.moveTo(fToPix(frameIndexes[i]) + 0.5, 0);
-    ctx.lineTo(fToPix(frameIndexes[i]) + 0.5, canvas.height);
+  for (var i = 0; i < slices.length; i++) {
+    ctx.moveTo(fToPix(slices[i].beatIdx) + 0.5, 0);
+    ctx.lineTo(fToPix(slices[i].beatIdx) + 0.5, canvas.height);
   }
   ctx.stroke();
 
-  ctx.restore();
-}
-
-function paintStripes(canvas, stripesBoundaryIndexes, stripesColors, bufLength) {
-  var ctx = canvas.getContext('2d');
-  ctx.save();
+  // paint the slices overlays
   ctx.strokeStyle = 'rgab(0, 0, 0, 0)';
-
-  fToPix = makeFrameToPixConverter(bufLength, canvas.width);
 
   var leftBound = 0;
   var rightBound;
   var i = 0;
-  for (i = 0; i < stripesBoundaryIndexes.length; i++) {
-    rightBound = fToPix(stripesBoundaryIndexes[i].endIdx);
+  for (i = 0; i < slices.length; i++) {
+    rightBound = fToPix(slices[i].endIdx);
 
-    ctx.fillStyle = stripesColors[i];
+    ctx.fillStyle = slices[i].color;
     ctx.fillRect(leftBound, 0, rightBound - leftBound, canvas.height);
 
     leftBound = rightBound;
   }
-
   ctx.restore();
 }
-

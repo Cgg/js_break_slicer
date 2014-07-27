@@ -12,6 +12,7 @@
  * a beat index. All indexes in the returned slices are exprimed in audio frame
  * indexes from the input buffer.
  */
+
 function findSlices(inputBuffer, chunkWidth, historyBufferWidth) {
   var slices = new Array();
 
@@ -137,9 +138,11 @@ function findSlices(inputBuffer, chunkWidth, historyBufferWidth) {
   // convert each slice indexes back to audio frame indexes
   slices.forEach(function(s) {
     s.beginIdx = s.beginIdx * chunkWidth;
-    s.endIdx = s.endIdx * chunkWidth;
+    s.endIdx = (s.endIdx + 1)* chunkWidth - 1;
     s.beatIdx = s.beatIdx * chunkWidth;
   });
+
+  slices[slices.length - 1].endIdx = inputBuffer.length - 1
 
   return slices;
 }

@@ -1,8 +1,10 @@
+button, select {
+  height: 2em;
+}
 .cvsdiv {
   position: relative;
   height: 256px;
   margin-top: 2em;
-
 }
 .cvs {
   position: absolute;

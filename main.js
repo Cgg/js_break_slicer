@@ -22,9 +22,12 @@ var outputBufferCvs = document.getElementById('output_buffer_canvas');
 outputBufferCvs.width = inputBufferCvs.width;
 var outputOverlayCvs = document.getElementById('output_overlay_canvas');
 outputOverlayCvs.width = inputBufferCvs.width;
+var outputProgCvs = document.getElementById('output_prog_overlay');
+outputProgCvs.width = inputBufferCvs.width;
 
-var progressPainter = makeProgressPainter(progOverlayCvs)
-player.progressChangedSignal().connect(progressPainter.setProgress)
+var inputProgressPainter = makeProgressPainter(progOverlayCvs);
+var outputProgressPainter = makeProgressPainter(outputProgCvs);
+player.progressChangedSignal().connect(outputProgressPainter.setProgress)
 
 sampleCombo.addEventListener('change',
   function(e) {

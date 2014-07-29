@@ -28,3 +28,7 @@
 #output_overlay_canvas {
   z-index: 1;
 }
+
+#output_prog_overlay {
+  z-index: 2;
+}

@@ -1,7 +1,8 @@
 window.onload = function()
 {
 var audioCtx = new AudioContext();
-var player = makePlayer(audioCtx);
+var inputPlayer = makePlayer(audioCtx);
+var outputPlayer = makePlayer(audioCtx);
 
 var inputBuffer;
 var slices;
@@ -9,7 +10,9 @@ var outputBuffer;
 var randomizedSlices;
 
 var sampleCombo = document.getElementById('sample_combo');
-var playButton = document.getElementById('play');
+var playInputBtn = document.getElementById('play');
+var playOutputBtn = document.getElementById('play_output');
+var shakeBtn = document.getElementById('shake');
 var canvases = document.getElementById('canvases');
 
 var inputBufferCvs = document.getElementById('visu');
@@ -28,22 +31,47 @@ outputProgCvs.width = inputBufferCvs.width;
 
 var inputProgressPainter = makeProgressPainter(progOverlayCvs);
 var outputProgressPainter = makeProgressPainter(outputProgCvs);
-player.progressChangedSignal().connect(outputProgressPainter.setProgress)
+inputPlayer.progressChangedSignal().connect(inputProgressPainter.setProgress);
+outputPlayer.progressChangedSignal().connect(outputProgressPainter.setProgress);
 
 sampleCombo.addEventListener('change',
   function(e) {
     loadSample(e.target.value);
 });
 
-playButton.addEventListener("click", function(e) {
+playInputBtn.addEventListener("click", function(e) {
   // toggle playback
-  playButton.innerHTML = "Play";
+  playInputBtn.innerHTML = "Play";
+  playOutputBtn.innerHTML = 'Play';
 
-  if (player.isPlaying()) {
-    player.stopPlayback();
+  outputPlayer.stopPlayback();
+
+  if (inputPlayer.isPlaying()) {
+    inputPlayer.stopPlayback();
   }
-  else if (player.startPlayback(outputBuffer)) {
-    playButton.innerHTML = "Stop";
+  else if (inputPlayer.startPlayback(inputBuffer)) {
+    playInputBtn.innerHTML = "Stop";
+  }
+});
+
+playOutputBtn.addEventListener('click', function(e) {
+  playInputBtn.innerHTML = 'Play';
+  playOutputBtn.innerHTML = 'Play';
+
+  inputPlayer.stopPlayback();
+
+  if (outputPlayer.isPlaying()) {
+    outputPlayer.stopPlayback();
+  }
+  else if (outputPlayer.startPlayback(outputBuffer)) {
+    playOutputBtn.innerHTML = 'Stop';
+  }
+});
+
+shakeBtn.addEventListener('click', function(e) {
+  randomize();
+  if (outputPlayer.isPlaying()) {
+    outputPlayer.startPlayback(outputBuffer);
   }
 });
 
@@ -114,8 +142,11 @@ function loadSample(uneURL) {
       outputBuffer = cloneAudioBuffer(audioCtx, inputBuffer);
       paintBuffer(inputBufferCvs, data);
       updateSlices();
-      if (player.isPlaying()) {
-        player.startPlayback(outputBuffer);
+      if (inputPlayer.isPlaying()) {
+        inputPlayer.startPlayback(inputBuffer);
+      }
+      else if (outputPlayer.isPlaying()) {
+        outputPlayer.startPlayback(outputBuffer);
       }
     });
   }

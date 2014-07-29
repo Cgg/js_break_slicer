@@ -1,34 +1,29 @@
 .cvsdiv {
   position: relative;
   height: 256px;
-}
+  margin-top: 2em;
 
+}
 .cvs {
   position: absolute;
   left: 0px;
   top: 0px;
 }
-
 #visu {
   z-index: 0;
 }
-
 #slice_overlay {
   z-index: 1;
 }
-
 #prog_overlay {
   z-index: 2;
 }
-
 #output_buffer_canvas {
   z-index: 0;
 }
-
 #output_overlay_canvas {
   z-index: 1;
 }
-
 #output_prog_overlay {
   z-index: 2;
 }

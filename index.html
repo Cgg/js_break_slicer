@@ -1,55 +1,71 @@
+<!DOCTYPE html>
 <html>
-<head>
-<meta charset='utf-8'>
-<link rel="stylesheet" type="text/css" href="style.css">
-<script src="signal.js"></script>
-<script src="utils.js"></script>
-<script src="main.js"></script>
-<script src="player.js"></script>
-<script src="find_slices.js"></script>
-<script src="math.js"></script>
-<script src="paint_buffer.js"></script>
-<script src="progress_painter.js"></script>
 
-<title>JS Break Slicer</title>
+<head>
+  <meta charset='utf-8'>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="lib/bootstrap.css">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <script src="lib/bootstrap.js"></script>
+  <script src="signal.js"></script>
+  <script src="utils.js"></script>
+  <script src="main.js"></script>
+  <script src="player.js"></script>
+  <script src="find_slices.js"></script>
+  <script src="math.js"></script>
+  <script src="paint_buffer.js"></script>
+  <script src="progress_painter.js"></script>
+
+  <title>JS Break Slicer</title>
 </head>
 
 <body>
+  <div class="container-fluid">
+    <h2>JS Break Slicer</h2>
+    <p>
+      You can see below a representation of the original buffer.
+      <br>
+      <ul>
+        <li>The vertical red lines figures the places where the algorithm thought there was a beat;</li>
+        <li>The rainbow stripes figure the slices out.</li>
+      </ul>
+    </p>
+    <div class="row">
+      <div class="col-md-1" style="margin-top:2em;">
 
-<select id='sample_combo'>
-  <option value='amen.ogg'>Amen break</option>
-  <option value='think.ogg'>Think break</option>
-  <option value='apache.ogg'>Apache break</option>
-</select>
+        <h4>Input</h4>
+        <div style="">
+          <select id='sample_combo' style="height:2em">
+            <option value='amen.ogg'>Amen break</option>
+            <option value='think.ogg'>Think break</option>
+            <option value='apache.ogg'>Apache break</option>
+          </select>&nbsp;
+          <button id="play" style="height:2em">Play</button>
+        </div>
+      </div>
+      <div class="col-md-11" id="canvases">
+        <div class="cvsdiv">
+          <canvas class="cvs" id="visu" height="256">not supported.</canvas>
+          <canvas class="cvs" id="slice_overlay" height="256">not supported.</canvas>
+          <canvas class="cvs" id="prog_overlay" height="3">not supported.</canvas>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-1" style="margin-top:2em;">
+        <h4>Output</h4>
+        <p>Place randomise button here</p>
+      </div>
+      <div class="col-md-11">
+        <div class="cvsdiv">
+          <canvas class="cvs" id="output_buffer_canvas" height="256">not supported.</canvas>
+          <canvas class="cvs" id="output_overlay_canvas" height="256">not supported.</canvas>
+          <canvas class="cvs" id="output_prog_overlay" height="3">not supported.</canvas>
+        </div>
+      </div>
+    </div>
 
-<button id="play">Play</button>
-
-<br>
-<br>
-
-<div>
-You can see below a representation of the original buffer.
-The vertical red lines figures the places where the algorithm thought there was
-a beat; The rainbow stripes figure the slices.
-</div>
-
-<br>
-
-<div class="cvsdiv">
-  <canvas class="cvs" id="visu" height="256">not supported.</canvas>
-  <canvas class="cvs" id="slice_overlay" height="256">not supported.</canvas>
-  <canvas class="cvs" id="prog_overlay" height="3">not supported.</canvas>
-</div>
-
-<br/>
-
-<div class="cvsdiv">
-  <canvas class="cvs" id="output_buffer_canvas" height="256">not supported.</canvas>
-  <canvas class="cvs" id="output_overlay_canvas" height="256">not supported.</canvas>
-  <canvas class="cvs" id="output_prog_overlay" height="3">not supported.</canvas>
-</div>
-
+  </div>
 </body>
 
 </html>
-

@@ -10,9 +10,10 @@ var randomizedSlices;
 
 var sampleCombo = document.getElementById('sample_combo');
 var playButton = document.getElementById('play');
+var canvases = document.getElementById('canvases');
 
 var inputBufferCvs = document.getElementById('visu');
-inputBufferCvs.width = window.innerWidth - 10;
+inputBufferCvs.width = canvases.offsetWidth;
 var sliceOverlayCvs = document.getElementById('slice_overlay');
 sliceOverlayCvs.width = inputBufferCvs.width;
 var progOverlayCvs = document.getElementById('prog_overlay');

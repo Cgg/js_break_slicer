@@ -1,5 +1,18 @@
 window.onload = function()
 {
+var huh = document.getElementById('huh');
+huh.addEventListener('click', function(e) {
+  var exp = document.getElementById('explanation');
+  if (huh.innerHTML == 'Huh?') {
+    huh.innerHTML = 'Ok!';
+    exp.hidden = false;
+  }
+  else {
+    huh.innerHTML = 'Huh?';
+    exp.hidden = true;
+  }
+});
+
 var audioCtx = new AudioContext();
 var inputPlayer = makePlayer(audioCtx);
 var outputPlayer = makePlayer(audioCtx);

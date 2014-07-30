@@ -9,18 +9,17 @@ function makePlayer(audioContext) {
   var audioSource = null;
   var playing = false;
 
-  var currentProgress = 0;
-  var progressChunk = 0;
+  var startTime;
+  var duration;
+
   var progressUpdateRate = 1000/25.0;
   var progressChangedSignal = makeSignal();
   var updateProgressInterval = -1
 
-  var updateProgress = function() {
-    currentProgress += progressChunk;
-    if(currentProgress > 1) {
-      currentProgress = 0
-    }
-    progressChangedSignal.trigger(currentProgress)
+  function updateProgress() {
+    var newProg = (audioCtx.currentTime - startTime) / duration;
+    newProg = newProg - Math.floor(newProg); // we are looping, remember.
+    progressChangedSignal.trigger(newProg);
   }
 
   var player = {
@@ -53,8 +52,8 @@ function makePlayer(audioContext) {
         return false;
       }
 
-      currentProgress = 0;
-      progressChunk = 1 / (buf.duration / (progressUpdateRate / 1000));
+      startTime = audioCtx.currentTime;
+      duration = buf.duration;
       updateProgressInterval = setInterval(updateProgress, progressUpdateRate)
 
       audioSource = audioCtx.createBufferSource();
